@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 class Network(object):
     """
@@ -6,20 +7,50 @@ class Network(object):
     So, we have one input layer, one hidden layer, and one output layer. 
     """
 
-    def __init__(self, nn_arch):
+    def __init__(self, architecture):
         """
-        @type  nn_arch: list 
-        @param nn_arch: Architecture of the neural network. Must be [x, y, z] form, where x,y,z are integers, 
-                        x: number of units in input layer
-                        y: number of units in hidden layer
-                        z: number of units in output layer
+        Initialize Network.
+
+        as parameter, only gets three valued list, which is 
+        [input layer, hidden layer, output layer] form. 
+        
+        Creates biases for hidden layer and output layer.
+        Note that input layer doesn't have biases. 
+        
+        Creates weights for (input-hidden), (hidden-output) connections. 
+
+        @type  architecture: list 
+        @param architecture: Architecture of the neural network. 
+                             Must be [ number of units in input layer,
+                                       number of units in hidden layer, 
+                                       number of units in output layer ] 
         """
-        self.num_layers = 3
-        self.nn_arch = nn_arch
-        # get the list [num_units_in_hidden_layer, num_unts_in_output_layer]
-        hidden_and_output_layers = nn_arch[1:]
-        self.biases = [np.random.randn(num_units, 1) for num_units in hidden_and_output_layers]
-        # get the list [(num_units_input_layer, num_units_hidden_layer), (num_units_hidden_layer, num_units_output_layer)]
-        connections_betw_layers = zip(nn_arch[:-1], nn_arch[1:])
-        self.weights = [np.random.randn(end_units, start_units) for start_units, end_units in connections_betw_layers]
+        self.num_layers = len(architecture)
+        self.architecture = architecture
+        
+        nnode_input = architecture[0]
+        nnode_hidden = architecture[1]
+        nnode_output = architecture[2]
+        
+        self.biases = [np.random.randn(nnode_hidden, 1), \
+                       np.random.randn(nnode_output, 1)]
+        
+        self.weights = [np.random.randn(nnode_hidden, nnode_input), \
+                        np.random.randn(nnode_output, nnode_hidden)]
+
+
+    def feedforword(self, a):
+        """Return the output of network."""
+        for bias, weight in zip(self.biases, self.weights):
+            a = sigmoid(np.dot(weight, a) + bias)
+        return a
+
+def sigmoid(x):
+    """The sigmoid function."""
+    return 1.0/(1.0+np.exp(-x))
+
+def sigmoid_prime(x):
+    """Derivative of the sigmoid function"""
+    return sigmoid(x)*(1-sigmoid(x))
+
 
