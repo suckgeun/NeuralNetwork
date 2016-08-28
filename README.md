@@ -1,14 +1,12 @@
 ## Neural Network implementation repo. 
-The base source code and data for this repo is from this website. 
-http://neuralnetworksanddeeplearning.com/chap1.html
-I will modify and clean up the code from the above website, based on the knowledge 
-I learnt from Udacity. 
+I implement Neural Network algorithm from scratch. 
+The algorithm is from Udacity, Machine Learning Nano Degree
 
 ## License
 
 MIT License
 
-Copyright (c) 2012-2015 Michael Nielsen
+Copyright (c) 2016-2016 Suckgeun Lee
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
