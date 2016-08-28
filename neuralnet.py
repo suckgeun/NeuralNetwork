@@ -11,11 +11,7 @@ class Network(object):
         self.weights = np.array([
             np.random.randn(nnode, nweight) for nnode, nweight
             in zip(arch[1:], arch[:-1])])
-        
-        self.sum_delta_w = None
-        self.sum_delta_b = None
-        
-        
+                
     def fit(self, dataset, labels, learn_rate = 2, nloop = 5000):
         
         for _i in range(nloop):
