@@ -1,8 +1,9 @@
 import numpy as np 
+import random
 
 class Network(object):
     
-    def __init__(self, arch = [2, 3, 1]):
+    def __init__(self, arch = [2, 3, 2]):
         
         self.arch = arch
         
@@ -12,26 +13,35 @@ class Network(object):
             np.random.randn(nnode, nweight) for nnode, nweight
             in zip(arch[1:], arch[:-1])])
                 
-    def fit(self, dataset, labels, learn_rate = 2, nloop = 5000):
+    def fit(self, training_data, testing_data,
+            num_epochs = 30, batch_size = 10, learn_rate = 0.05):
         
-        for _i in range(nloop):
+        random.shuffle(training_data)
+        
+        for i in range(num_epochs):
             
-            sum_del_w = None
-            sum_del_b = None
-            for data, label in zip(dataset, labels):
-                xs, ys = self.feedforward(data)
-                errors = self.calc_errors(ys[-1], label)
-                del_w, del_b = self.calc_delta_weight_bias(xs, ys, errors)
+            batches = [training_data[k : k + batch_size] 
+                           for k in xrange(0, len(training_data), batch_size)]
+            
+            for batch in batches:
+                sum_del_w = None
+                sum_del_b = None
+                for data, label in batch:
+                    xs, ys = self.feedforward(data)
+                    errors = self.calc_errors(ys[-1], label)
+                    del_w, del_b = self.calc_delta_weight_bias(xs, ys, errors)
+                    
+                    if sum_del_w is None:
+                        sum_del_w = del_w
+                        sum_del_b = del_b
+                    else:
+                        sum_del_w += del_w
+                        sum_del_b += del_b                    
                 
-                if sum_del_w is None:
-                    sum_del_w = del_w
-                    sum_del_b = del_b
-                else:
-                    sum_del_w += del_w
-                    sum_del_b += del_b                    
-            
-            self.weights += learn_rate*sum_del_w
-            self.biases += learn_rate*sum_del_b
+                self.weights += learn_rate*sum_del_w
+                self.biases += learn_rate*sum_del_b
+                
+            self.predict(testing_data, i)
     
     def feedforward(self, a):
         xs = []
@@ -60,12 +70,30 @@ class Network(object):
             delta_b.append(np.array(e*sigmoid_prime, ndmin=2))
         return np.array(delta_w), np.array(delta_b)
     
-    def predict(self, dataset, labels):
-        for data, label in zip(dataset, labels):
+    def predict(self, testing_data, index):
+        count = 0
+        for data, label in testing_data:
             xs, ys = self.feedforward(data)
-            errors = self.calc_errors(ys[-1], label)
-            print "data: {0}, prediction: {1} ({2}), error: {3}".format(
-                xs[0].flatten(), round(ys[-1], 2), label, round(errors[-1], 2))
+            
+            if np.argmax(ys[-1]) == label:
+                count += 1
+                
+        print "index: {0}, count: {1}".format(index, count)
     
 def sigmoid(x):
     return 1/(1+np.exp(-x))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
